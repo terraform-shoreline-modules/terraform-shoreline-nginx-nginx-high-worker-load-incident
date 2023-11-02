@@ -1,0 +1,118 @@
+{
+  "name": "high_nginx_worker_load_incident",
+  "description": "High Nginx Worker Load incident refers to the situation where the worker processes and connections on an Nginx server experience high load, which can cause a negative impact on the server's performance and response times. This can occur due to a wide range of factors, including high traffic volumes, poorly optimized configurations, or other factors that increase the demand on the server. As a result, it becomes necessary to resolve this issue by optimizing worker processes and connections to balance server load effectively and ensure the server can handle the load without any negative impacts on performance or response times.",
+  "params": [
+    {
+      "name": "URL",
+      "value": ""
+    },
+    {
+      "name": "PATH_TO_NGINX_CONF",
+      "value": ""
+    },
+    {
+      "name": "NUMBER_OF_WORKER_CONNECTIONS",
+      "value": ""
+    },
+    {
+      "name": "NGINX_PROCESS_ID",
+      "value": ""
+    },
+    {
+      "name": "STATUS_PATH",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## High Nginx Worker Load Incident\nHigh Nginx Worker Load incident refers to the situation where the worker processes and connections on an Nginx server experience high load, which can cause a negative impact on the server's performance and response times. This can occur due to a wide range of factors, including high traffic volumes, poorly optimized configurations, or other factors that increase the demand on the server. As a result, it becomes necessary to resolve this issue by optimizing worker processes and connections to balance server load effectively and ensure the server can handle the load without any negative impacts on performance or response times."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the current worker processes running"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ps -ef | grep nginx | grep worker`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the current CPU and memory usage of the Nginx process"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `top -p ${NGINX_PROCESS_ID}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the current Nginx configuration for thread support"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nginx -V 2>&1 | grep --color -- --with-threads`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the current Nginx configuration for status module"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nginx -V 2>&1 | grep --color -- --with-http_stub_status_module`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Nginx status metrics"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl ${URL}/${STATUS_PATH}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Optimize worker connections to balance server load effectively."
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_worker_connections_optimizer($PATH_TO_NGINX_CONF, $NUMBER_OF_WORKER_CONNECTIONS)"
+    }
+  ]
+}
